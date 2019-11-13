@@ -1,0 +1,29 @@
+PODS:
+  - Flutter (1.0.0)
+  - MMKV (1.0.23)
+  - share_mmkv (0.0.1):
+    - Flutter
+    - MMKV
+
+DEPENDENCIES:
+  - Flutter (from `.symlinks/flutter/ios`)
+  - share_mmkv (from `.symlinks/plugins/share_mmkv/ios`)
+
+SPEC REPOS:
+  trunk:
+    - MMKV
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: ".symlinks/flutter/ios"
+  share_mmkv:
+    :path: ".symlinks/plugins/share_mmkv/ios"
+
+SPEC CHECKSUMS:
+  Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
+  MMKV: 031ae51aedc0af1b250922f7ed8a6b6ee2f94c4c
+  share_mmkv: 9b82f1a2f2b4921af7d213702d220b6080f2cff4
+
+PODFILE CHECKSUM: 7fb83752f59ead6285236625b82473f90b1cb932
+
+COCOAPODS: 1.8.4
