@@ -13,42 +13,130 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   String _platformVersion = 'Unknown';
+  ShareMmkv _shareMmkv = ShareMmkv();
 
-  @override
-  void initState() {
-    super.initState();
-    // initPlatformState();
+
+  Widget _titleSection(
+      {@required String title, @required GestureTapCallback tap}) {
+    return GestureDetector(
+      onTap: tap,
+      child: Container(
+        margin: EdgeInsets.only(top: 10, left: 10, right: 10),
+        height: 50,
+        width: double.infinity,
+        color: Colors.blue,
+        child: Center(child: Text(title)),
+      ),
+    );
   }
-
-  // // Platform messages are asynchronous, so we initialize in an async method.
-  // Future<void> initPlatformState() async {
-  //   String platformVersion;
-  //   // Platform messages may fail, so we use a try/catch PlatformException.
-  //   try {
-  //     platformVersion = await ShareMmkv.platformVersion;
-  //   } on PlatformException {
-  //     platformVersion = 'Failed to get platform version.';
-  //   }
-
-  //   // If the widget was removed from the tree while the asynchronous platform
-  //   // message was in flight, we want to discard the reply rather than calling
-  //   // setState to update our non-existent appearance.
-  //   if (!mounted) return;
-
-  //   setState(() {
-  //     _platformVersion = platformVersion;
-  //   });
-  // }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Plugin example app'),
+          title: const Text('ShareMmkv Demo'),
         ),
         body: Center(
-          child: Text('Running on: $_platformVersion\n'),
+          child: ListView(
+            children: <Widget>[
+              _titleSection(
+                  title: "set map",
+                  tap: () async {
+                    bool success = await _shareMmkv
+                        .setSameValueMapWithMap({"a": "a---111", "b": "b----1111"}, "string");
+                    print("write success = $success");
+                  }),
+              _titleSection(
+                title: "get map with list",
+                tap: () async {
+                  Map<dynamic, dynamic> map = await _shareMmkv
+                      .getSameValueMapWithListKey(["a", "b"], "string");
+                  print("flutter = $map");
+                  print(map["a"].runtimeType);
+                  print(map["b"].runtimeType);
+                },
+              ),
+              _titleSection(
+                  title: "set string",
+                  tap: () async {
+                    bool success =
+                        await _shareMmkv.setString("bool", "I'm string");
+                    print("write string success = $success");
+                  }),
+              _titleSection(
+                title: "get string",
+                tap: () async {
+                  final string = await _shareMmkv.getString("bool");
+                  print("get = $string");
+                },
+              ),
+              _titleSection(
+                  title: "set bool",
+                  tap: () async {
+                    bool success =
+                    await _shareMmkv.setBool("bool", false);
+                    print("write bool success = $success");
+                  }),
+              _titleSection(
+                title: "get bool",
+                tap: () async {
+                  final bool = await _shareMmkv.getBool("bool");
+                  print("get = $bool");
+                },
+              ),
+
+              _titleSection(
+                  title: "set double",
+                  tap: () async {
+                    bool success =
+                    await _shareMmkv.setDouble("bool", 1.21223123);
+                    print("write double success = $success");
+                  }),
+              _titleSection(
+                title: "get double",
+                tap: () async {
+                  final bool = await _shareMmkv.getDouble("bool");
+                  print("get = $bool");
+                },
+              ),
+              _titleSection(
+                  title: "set int",
+                  tap: () async {
+                    bool success =
+                    await _shareMmkv.setInt("int",21223123);
+                    print("write int success = $success");
+                  }),
+              _titleSection(
+                title: "get int",
+                tap: () async {
+                  final bool = await _shareMmkv.getInt("int");
+                  print("get = $bool");
+                },
+              ),
+              _titleSection(
+                  title: "count",
+                  tap: () async {
+                    int count =
+                    await _shareMmkv.count();
+                    print("get count = $count");
+                  }),
+              _titleSection(
+                title: "remove int",
+                tap: () async {
+                  final bool = await _shareMmkv.remove("int");
+                  print("remove  = $bool");
+                },
+              ),
+              _titleSection(
+                title: "clear",
+                tap: () async {
+                  final bool = await _shareMmkv.clear();
+                  print("remove  = $bool");
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );

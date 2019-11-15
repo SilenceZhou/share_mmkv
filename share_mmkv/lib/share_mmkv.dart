@@ -6,13 +6,17 @@ class ShareMmkv {
   static const String CHANNEL_NAME = "com.silencezhou.sharemmkv";
   static const MethodChannel _channel = const MethodChannel(CHANNEL_NAME);
 
+  static ShareMmkv _instance;
+
+  factory ShareMmkv() => _sharedInstance();
+
   ShareMmkv._();
-  static Completer<ShareMmkv> _completer;
-  static Future<ShareMmkv> getInstance() {
-    if (_completer == null) {
-      _completer = Completer<ShareMmkv>();
+
+  static ShareMmkv _sharedInstance() {
+    if (_instance == null) {
+      _instance = ShareMmkv._();
     }
-    return _completer.future;
+    return _instance;
   }
 
   /// Get
@@ -22,12 +26,26 @@ class ShareMmkv {
 
   Future<double> getDouble(String key) => _getValue("Double", key);
 
-  Future<bool> getString(String key) => _getValue("String", key);
+  Future<String> getString(String key) => _getValue("String", key);
 
-  Future<List<String>> getStringList(String key) =>
-      _getValue("StringList", key);
 
-  Future<Object> _getValue(String valueType, String key) {
+  Future<Map<dynamic, dynamic>> getSameValueMapWithListKey(
+      List<String> keys, String valueType) {
+    final Map<String, dynamic> params = <String, dynamic>{
+      'keys': keys,
+      'valueType': valueType,
+    };
+    if (keys == null) {
+      return Future.value(null);
+    } else {
+      return _channel
+          .invokeMethod<Map<dynamic, dynamic>>(
+              'getSameValueMapWithListKey', params)
+          .then<Map<dynamic, dynamic>>((dynamic result) => result);
+    }
+  }
+
+  Future<T> _getValue<T>(String valueType, String key) {
     final Map<String, dynamic> params = <String, dynamic>{
       'key': '$_prefix$key',
     };
@@ -35,13 +53,13 @@ class ShareMmkv {
       return Future.value(null);
     } else {
       return _channel
-          .invokeMethod<bool>('get$valueType', params)
-          .then<bool>((dynamic result) => result);
+          .invokeMethod<T>('get$valueType', params)
+          .then<T>((dynamic result) => result);
     }
   }
 
   /// Set
-  ///  If [value] is null, this is equivalent to calling [remove()] on the [key].
+  /// If [value] is null, this is equivalent to calling [remove()] on the [key].
   Future<bool> setBool(String key, bool value) => _setValue("Bool", key, value);
 
   Future<bool> setInt(String key, int value) => _setValue("Int", key, value);
@@ -50,9 +68,6 @@ class ShareMmkv {
       _setValue("Double", key, value);
 
   Future<bool> setString(String key, String value) =>
-      _setValue("String", key, value);
-
-  Future<bool> setStringList(String key, List<String> value) =>
       _setValue("String", key, value);
 
   Future<bool> _setValue(String valueType, String key, Object value) {
@@ -71,6 +86,22 @@ class ShareMmkv {
     }
   }
 
+  Future<bool> setSameValueMapWithMap(
+      Map<String, dynamic> map, String valueType) {
+    final Map<String, dynamic> params = <String, dynamic>{
+      'map': map,
+      'valueType': valueType
+    };
+
+    if (map == null) {
+      return Future.value(null);
+    } else {
+      return _channel
+          .invokeMethod<bool>('setSameValueMapWithMap', params)
+          .then<bool>((dynamic result) => result);
+    }
+  }
+
   /// removeForKey
   Future<bool> remove(String key) => _setValue(null, key, null);
 
@@ -79,6 +110,4 @@ class ShareMmkv {
 
   /// count
   Future<int> count() => _channel.invokeMethod('count');
-
-  ///
 }
