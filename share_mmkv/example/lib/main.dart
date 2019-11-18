@@ -53,21 +53,19 @@ class _MyAppState extends State<MyApp> {
                   Map<dynamic, dynamic> map = await _shareMmkv
                       .getSameValueMapWithListKey(["a", "b"], "string");
                   print("flutter = $map");
-                  print(map["a"].runtimeType);
-                  print(map["b"].runtimeType);
                 },
               ),
               _titleSection(
                   title: "set string",
                   tap: () async {
                     bool success =
-                        await _shareMmkv.setString("bool", "I'm string");
+                        await _shareMmkv.setString("string", "I'm string");
                     print("write string success = $success");
                   }),
               _titleSection(
                 title: "get string",
                 tap: () async {
-                  final string = await _shareMmkv.getString("bool");
+                  final string = await _shareMmkv.getString("string");
                   print("get = $string");
                 },
               ),
@@ -90,13 +88,13 @@ class _MyAppState extends State<MyApp> {
                   title: "set double",
                   tap: () async {
                     bool success =
-                    await _shareMmkv.setDouble("bool", 1.21223123);
+                    await _shareMmkv.setDouble("double", 1.21223123);
                     print("write double success = $success");
                   }),
               _titleSection(
                 title: "get double",
                 tap: () async {
-                  final bool = await _shareMmkv.getDouble("bool");
+                  final bool = await _shareMmkv.getDouble("double");
                   print("get = $bool");
                 },
               ),

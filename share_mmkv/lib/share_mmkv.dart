@@ -2,19 +2,18 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 
 class ShareMmkv {
-  static const String _prefix = 'flutter.';
-  static const String CHANNEL_NAME = "com.silencezhou.sharemmkv";
-  static const MethodChannel _channel = const MethodChannel(CHANNEL_NAME);
 
-  static ShareMmkv _instance;
+  static const MethodChannel _channel = const MethodChannel("com.silencezhou.sharemmkv");
+  static const String _prefix = 'flutter.';
 
   factory ShareMmkv() => _sharedInstance();
-
-  ShareMmkv._();
-
+  final Map<String, Object> _cache;
+  ShareMmkv._(this._cache);
+  static ShareMmkv _instance;
   static ShareMmkv _sharedInstance() {
     if (_instance == null) {
-      _instance = ShareMmkv._();
+      final Map<String, Object> cache = <String, Object>{};
+      _instance = ShareMmkv._(cache);
     }
     return _instance;
   }
@@ -28,14 +27,16 @@ class ShareMmkv {
 
   Future<String> getString(String key) => _getValue("String", key);
 
-
   Future<Map<dynamic, dynamic>> getSameValueMapWithListKey(
       List<String> keys, String valueType) {
+
+    assert(keys is List, "keys is not list");
+
     final Map<String, dynamic> params = <String, dynamic>{
-      'keys': keys,
+      'keys': keys.map((v) => '$_prefix$v').toList(),
       'valueType': valueType,
     };
-    if (keys == null) {
+    if (keys == null && keys.runtimeType == List) {
       return Future.value(null);
     } else {
       return _channel
@@ -52,9 +53,13 @@ class ShareMmkv {
     if (key == null) {
       return Future.value(null);
     } else {
-      return _channel
-          .invokeMethod<T>('get$valueType', params)
-          .then<T>((dynamic result) => result);
+      if (_cache.containsKey(key)) {
+        return Future.value(_cache[key]);
+      } else {
+        return _channel
+            .invokeMethod<T>('get$valueType', params)
+            .then<T>((dynamic result) => result);
+      }
     }
   }
 
@@ -79,6 +84,7 @@ class ShareMmkv {
           .invokeMethod<bool>("remove", params)
           .then<bool>((dynamic result) => result);
     } else {
+      _cache[key] = value;
       params['value'] = value;
       return _channel
           .invokeMethod<bool>('set$valueType', params)
@@ -88,10 +94,14 @@ class ShareMmkv {
 
   Future<bool> setSameValueMapWithMap(
       Map<String, dynamic> map, String valueType) {
+
+    assert(map is Map, "map is not Map");
+
     final Map<String, dynamic> params = <String, dynamic>{
-      'map': map,
+      'map': map.map((key, value) => MapEntry('$_prefix$key', value)),
       'valueType': valueType
     };
+
 
     if (map == null) {
       return Future.value(null);

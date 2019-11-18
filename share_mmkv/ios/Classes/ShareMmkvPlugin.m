@@ -10,7 +10,7 @@ static NSString *const ValueTypeDouble  = @"double";
 static NSString *const  KEY             = @"key";
 static NSString *const  KEYS            = @"keys";
 static NSString *const  VALUE           = @"value";
-static NSString *const  VALUETYPE       =  @"valueType";
+static NSString *const  VALUETYPE       = @"valueType";
 static NSString *const  MAP             = @"map";
 
 
@@ -149,7 +149,7 @@ static inline BOOL isEmpty(id thing) {
     
    __block BOOL isSuccess = YES;
     [map enumerateKeysAndObjectsUsingBlock:^(NSString  * _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
-        
+
         BOOL isSaveSussess = YES;
         if ([ValueTypeString isEqualToString:valueType]) {
             isSaveSussess = [mmkv setString:obj forKey:key];

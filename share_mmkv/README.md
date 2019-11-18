@@ -1,6 +1,6 @@
 # share_mmkv
 
-A new flutter plugin project.
+ A mmkv flutter plugin project.
 
 ## Getting Started
 

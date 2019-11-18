@@ -1,8 +1,8 @@
 name: share_mmkv
-description: A new flutter plugin project.
-version: 0.0.1
-author:
-homepage:
+description: A mmkv flutter plugin project.
+version: 0.0.4
+author: SilenceZhou <silencezhoushuai@gmail.com>
+homepage: https://github.com/SilenceZhou/share_mmkv
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
