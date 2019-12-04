@@ -56,6 +56,20 @@ class _MyAppState extends State<MyApp> {
                 },
               ),
               _titleSection(
+                  title: "set string list",
+                  tap: () async {
+                    bool success =
+                    await _shareMmkv.setStringList("stringlist", ["11111I'm string", "2222I'm string", "3333I'm string"]);
+                    print("write string success = $success");
+                  }),
+              _titleSection(
+                title: "get string list",
+                tap: () async {
+                  final string = await _shareMmkv.getStringList("stringlist");
+                  print("get = $string");
+                },
+              ),
+              _titleSection(
                   title: "set string",
                   tap: () async {
                     bool success =

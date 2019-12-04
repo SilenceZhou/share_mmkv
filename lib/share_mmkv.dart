@@ -27,6 +27,18 @@ class ShareMmkv {
 
   Future<String> getString(String key) => _getValue("String", key);
 
+  Future<List<String>> getStringList(String key) {
+    if (key == null) return Future.value(null);
+
+    if (_cache.containsKey(key)) {
+      return Future.value(_cache[key]);
+    } else {
+      return _channel
+          .invokeMethod<List<dynamic>>('getStringList', {'key': '$_prefix$key'})
+          .then((val) => List<String>.from(val));
+    }
+  }
+
   Future<Map<dynamic, dynamic>> getSameValueMapWithListKey(
       List<String> keys, String valueType) {
 
@@ -75,11 +87,15 @@ class ShareMmkv {
   Future<bool> setString(String key, String value) =>
       _setValue("String", key, value);
 
+  Future<bool> setStringList(String key, List<String> value) =>
+      _setValue("StringList", key, value);
+
   Future<bool> _setValue(String valueType, String key, Object value) {
     final Map<String, dynamic> params = <String, dynamic>{
       'key': '$_prefix$key',
     };
     if (value == null) {
+      _cache.remove(key);
       return _channel
           .invokeMethod<bool>("remove", params)
           .then<bool>((dynamic result) => result);

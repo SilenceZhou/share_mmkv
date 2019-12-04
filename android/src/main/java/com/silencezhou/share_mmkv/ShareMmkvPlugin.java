@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.tencent.mmkv.MMKV;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -127,6 +128,19 @@ public class ShareMmkvPlugin implements MethodCallHandler {
           String getStringStatus = mmkv.decodeString(key);
           result.success(getStringStatus);
           break;
+
+        case "setStringList":
+          if (value instanceof List) {
+            result.success(setStringList(key, (List<String>) value, mmkv));
+          } else {
+            result.success(false);
+          }
+          break;
+
+        case "getStringList":
+          result.success(getStringList(key, mmkv));
+          break;
+
         case "remove":
           mmkv.removeValueForKey(key);
           result.success(true);
@@ -154,6 +168,34 @@ public class ShareMmkvPlugin implements MethodCallHandler {
     } catch (Exception e) {
       result.error("Exception encountered", call.method, e);
     }
+  }
+
+
+  private  static final String separator = "#";
+
+  private boolean setStringList(String key, List<String> stringList, MMKV mmkv) {
+
+    StringBuffer sb = new StringBuffer();
+    for (int i = 0; i < stringList.size(); i++) {
+      if (stringList.get(i) == null || stringList.get(i).equals("")) {
+        continue;
+      }
+      sb.append(stringList.get(i));
+      sb.append(separator);
+    }
+
+    if (sb.toString().length() <= 0) return false;
+    return mmkv.encode(key, sb.toString());
+  }
+
+  private List<String> getStringList(String key, MMKV mmkv) {
+
+   String value = mmkv.decodeString(key);
+   if (value == null || value.equals("")) {
+     return null;
+   }
+
+   return Arrays.asList(value.split(separator));
   }
 
 

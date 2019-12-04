@@ -99,6 +99,18 @@ static inline BOOL isEmpty(id thing) {
         
         result([mmkv getStringForKey:key]);
         
+    } else if ([method isEqualToString:@"setStringList"]) {
+        
+        if ([value isKindOfClass:[NSArray class]]) {
+            result([NSNumber numberWithBool:[self setStringList:key stringList:(NSArray *)value mmkv:mmkv]]);
+        } else {
+            result(@(false));
+        }
+        
+    } else if ([method isEqualToString:@"getStringList"]) {
+
+        result([self getStringList:key mmkv:mmkv]);
+        
     } else if ([method isEqualToString:@"contains"]) {
         result([NSNumber numberWithBool:[mmkv containsKey:key]]);
     } else if ([method isEqualToString:@"remove"]) {
@@ -114,6 +126,17 @@ static inline BOOL isEmpty(id thing) {
     } else {
         result(FlutterMethodNotImplemented);
     }
+}
+
+- (BOOL)setStringList:(NSString *)key stringList:(NSArray *)stringList mmkv:(MMKV *)mmkv{
+    NSString *value = [stringList componentsJoinedByString:@"#"];
+    return [mmkv setString:value forKey:key];
+}
+
+- (NSArray <NSString *> *)getStringList:(NSString *)key mmkv:(MMKV *)mmkv{
+    NSString *listString = [mmkv getStringForKey:key];
+    NSArray *stringList = [listString componentsSeparatedByString:@"#"];
+    return stringList != nil ? stringList : @[];
 }
 
 
