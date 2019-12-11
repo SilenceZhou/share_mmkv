@@ -12,6 +12,9 @@ static NSString *const  KEYS            = @"keys";
 static NSString *const  VALUE           = @"value";
 static NSString *const  VALUETYPE       = @"valueType";
 static NSString *const  MAP             = @"map";
+static NSString *const  SEPARATOR       = @"separator";
+
+static NSString *const  DEFUALTSEPARATOR = @"##";
 
 
 static inline BOOL isEmpty(id thing) {
@@ -40,6 +43,7 @@ static inline BOOL isEmpty(id thing) {
     NSString *keys = arguments[KEYS];
     NSObject *value = arguments[VALUE];
     NSString *valueType = arguments[VALUETYPE];
+    NSString *separator = arguments[SEPARATOR];
     NSDictionary *map = arguments[MAP];
     
     MMKV *mmkv = [MMKV defaultMMKV];
@@ -102,14 +106,15 @@ static inline BOOL isEmpty(id thing) {
     } else if ([method isEqualToString:@"setStringList"]) {
         
         if ([value isKindOfClass:[NSArray class]]) {
-            result([NSNumber numberWithBool:[self setStringList:key stringList:(NSArray *)value mmkv:mmkv]]);
+            if (isEmpty(separator)) { separator = DEFUALTSEPARATOR; }
+            result([NSNumber numberWithBool:[self setStringList:key stringList:(NSArray *)value mmkv:mmkv separator:separator]]);
         } else {
             result(@(false));
         }
         
     } else if ([method isEqualToString:@"getStringList"]) {
-
-        result([self getStringList:key mmkv:mmkv]);
+        if (isEmpty(separator)) { separator = DEFUALTSEPARATOR; }
+        result([self getStringList:key mmkv:mmkv separator:separator]);
         
     } else if ([method isEqualToString:@"contains"]) {
         result([NSNumber numberWithBool:[mmkv containsKey:key]]);
@@ -128,14 +133,14 @@ static inline BOOL isEmpty(id thing) {
     }
 }
 
-- (BOOL)setStringList:(NSString *)key stringList:(NSArray *)stringList mmkv:(MMKV *)mmkv{
-    NSString *value = [stringList componentsJoinedByString:@"#"];
+- (BOOL)setStringList:(NSString *)key stringList:(NSArray *)stringList mmkv:(MMKV *)mmkv separator:(NSString *)separator{
+    NSString *value = [stringList componentsJoinedByString:separator];
     return [mmkv setString:value forKey:key];
 }
 
-- (NSArray <NSString *> *)getStringList:(NSString *)key mmkv:(MMKV *)mmkv{
+- (NSArray <NSString *> *)getStringList:(NSString *)key mmkv:(MMKV *)mmkv separator:(NSString *)separator{
     NSString *listString = [mmkv getStringForKey:key];
-    NSArray *stringList = [listString componentsSeparatedByString:@"#"];
+    NSArray *stringList = [listString componentsSeparatedByString:separator];
     return stringList != nil ? stringList : @[];
 }
 

@@ -7,7 +7,7 @@ class ShareMmkv {
   static const String _prefix = 'flutter.';
 
   factory ShareMmkv() => _sharedInstance();
-  final Map<String, Object> _cache;
+  final Map<String, Object> _cache; // key 存取的原始key , mmkv会添加前缀 flutter.
   ShareMmkv._(this._cache);
   static ShareMmkv _instance;
   static ShareMmkv _sharedInstance() {
@@ -27,14 +27,14 @@ class ShareMmkv {
 
   Future<String> getString(String key) => _getValue("String", key);
 
-  Future<List<String>> getStringList(String key) {
+  Future<List<String>> getStringList(String key, {String separator = "##"}) {
     if (key == null) return Future.value(null);
 
     if (_cache.containsKey(key)) {
       return Future.value(_cache[key]);
     } else {
       return _channel
-          .invokeMethod<List<dynamic>>('getStringList', {'key': '$_prefix$key'})
+          .invokeMethod<List<dynamic>>('getStringList', {'key': '$_prefix$key', "separator" : separator})
           .then((val) => List<String>.from(val));
     }
   }
@@ -87,10 +87,10 @@ class ShareMmkv {
   Future<bool> setString(String key, String value) =>
       _setValue("String", key, value);
 
-  Future<bool> setStringList(String key, List<String> value) =>
-      _setValue("StringList", key, value);
+  Future<bool> setStringList(String key, List<String> value, {String separator}) =>
+      _setValue("StringList", key, value, separator: separator);
 
-  Future<bool> _setValue(String valueType, String key, Object value) {
+  Future<bool> _setValue(String valueType, String key, Object value, {String separator = "##"}) {
     final Map<String, dynamic> params = <String, dynamic>{
       'key': '$_prefix$key',
     };
@@ -102,6 +102,9 @@ class ShareMmkv {
     } else {
       _cache[key] = value;
       params['value'] = value;
+      if (valueType == "StringList" && separator.isNotEmpty) {
+        params['separator'] = separator;
+      }
       return _channel
           .invokeMethod<bool>('set$valueType', params)
           .then<bool>((dynamic result) => result);
@@ -122,6 +125,7 @@ class ShareMmkv {
     if (map == null) {
       return Future.value(null);
     } else {
+      _cache.addAll(map);
       return _channel
           .invokeMethod<bool>('setSameValueMapWithMap', params)
           .then<bool>((dynamic result) => result);
@@ -132,7 +136,10 @@ class ShareMmkv {
   Future<bool> remove(String key) => _setValue(null, key, null);
 
   /// clear
-  Future<bool> clear() => _channel.invokeMethod('clear');
+  Future<bool> clear() {
+    _cache.clear();
+    return _channel.invokeMethod('clear');
+  }
 
   /// count
   Future<int> count() => _channel.invokeMethod('count');

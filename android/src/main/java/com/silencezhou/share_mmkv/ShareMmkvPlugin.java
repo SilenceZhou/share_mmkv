@@ -1,6 +1,7 @@
 package com.silencezhou.share_mmkv;
 
 import android.content.Context;
+import android.text.TextUtils;
 
 import com.tencent.mmkv.MMKV;
 
@@ -21,16 +22,18 @@ import io.flutter.plugin.common.PluginRegistry.Registrar;
 /** ShareMmkvPlugin */
 public class ShareMmkvPlugin implements MethodCallHandler {
 
-  public static final String KEY = "key";
-  public static final String KEYS = "keys";
-  public static final String VALUE = "value";
+  private static final String KEY = "key";
+  private static final String KEYS = "keys";
+  private static final String VALUE = "value";
 
-  public static final String ValueTypeString = "string";
-  public static final String ValueTypeBool = "bool";
-  public static final String ValueTypeInt = "int";
-  public static final String ValueTypeDouble = "double";
-  public static final String VALUETYPE = "valueType";
-  public static final String MAP = "map";
+  private static final String ValueTypeString = "string";
+  private static final String ValueTypeBool = "bool";
+  private static final String ValueTypeInt = "int";
+  private static final String ValueTypeDouble = "double";
+  private static final String VALUETYPE = "valueType";
+  private static final String MAP = "map";
+  private static final String SEPARATOR = "separator";
+  private  static final String DEFUALTSEPARATOR = "##";
 
 
   public ShareMmkvPlugin(Context context) {
@@ -56,6 +59,7 @@ public class ShareMmkvPlugin implements MethodCallHandler {
     List<String> keysParams = (List<String>) arguments.get(KEYS);
     Object value = arguments.get(VALUE);
     String valueType = (String) arguments.get(VALUETYPE);
+    String separator = (String) arguments.get(SEPARATOR);
     Map<String, Object> map = (Map<String, Object>) arguments.get(MAP);
 
     MMKV mmkv = MMKV.defaultMMKV();
@@ -131,14 +135,20 @@ public class ShareMmkvPlugin implements MethodCallHandler {
 
         case "setStringList":
           if (value instanceof List) {
-            result.success(setStringList(key, (List<String>) value, mmkv));
+            if (TextUtils.isEmpty(separator)) {
+              separator = DEFUALTSEPARATOR;
+            }
+            result.success(setStringList(key, (List<String>) value, mmkv, separator));
           } else {
             result.success(false);
           }
           break;
 
         case "getStringList":
-          result.success(getStringList(key, mmkv));
+          if (TextUtils.isEmpty(separator)) {
+            separator = DEFUALTSEPARATOR;
+          }
+          result.success(getStringList(key, mmkv, separator));
           break;
 
         case "remove":
@@ -171,9 +181,7 @@ public class ShareMmkvPlugin implements MethodCallHandler {
   }
 
 
-  private  static final String separator = "#";
-
-  private boolean setStringList(String key, List<String> stringList, MMKV mmkv) {
+  private boolean setStringList(String key, List<String> stringList, MMKV mmkv, String separator) {
 
     StringBuffer sb = new StringBuffer();
     for (int i = 0; i < stringList.size(); i++) {
@@ -188,7 +196,7 @@ public class ShareMmkvPlugin implements MethodCallHandler {
     return mmkv.encode(key, sb.toString());
   }
 
-  private List<String> getStringList(String key, MMKV mmkv) {
+  private List<String> getStringList(String key, MMKV mmkv, String separator) {
 
    String value = mmkv.decodeString(key);
    if (value == null || value.equals("")) {

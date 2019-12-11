@@ -40,6 +40,19 @@ class _MyAppState extends State<MyApp> {
         body: Center(
           child: ListView(
             children: <Widget>[
+
+              _titleSection(
+                  title: "test map after addAll map",
+                  tap: () async {
+                    Map<String, dynamic> map = {
+                      "key": "value1",
+                      "key2": "value2"
+                    };
+                    Map<String, dynamic> map2 = {"a": "aaa1", "b": "bbb1"};
+                    print("11111 - $map");
+                    map.addAll(map2);
+                    print("22222 - $map");
+                  }),
               _titleSection(
                   title: "set map",
                   tap: () async {
@@ -59,13 +72,13 @@ class _MyAppState extends State<MyApp> {
                   title: "set string list",
                   tap: () async {
                     bool success =
-                    await _shareMmkv.setStringList("stringlist", ["11111I'm string", "2222I'm string", "3333I'm string"]);
+                    await _shareMmkv.setStringList("stringlist", ["11111I'm string", "2222I'm string", "3333I'm string"], separator: "%%%%");
                     print("write string success = $success");
                   }),
               _titleSection(
                 title: "get string list",
                 tap: () async {
-                  final string = await _shareMmkv.getStringList("stringlist");
+                  final string = await _shareMmkv.getStringList("stringlist", separator: "%%%%");
                   print("get = $string");
                 },
               ),
